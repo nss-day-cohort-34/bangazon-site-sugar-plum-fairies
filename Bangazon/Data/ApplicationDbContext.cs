@@ -59,9 +59,27 @@ namespace Bangazon.Data {
                 SecurityStamp = "7f434309-a4d9-48e9-9ebb-8803db794577",
                 Id = "00000000-ffff-ffff-ffff-ffffffffffff"
             };
+            ApplicationUser anotherUser = new ApplicationUser
+            {
+                FirstName = "Bobby",
+                LastName = "Brady",
+                StreetAddress = "123 Drury Lane",
+                UserName = "bobby@bobby.com",
+                NormalizedUserName = "BOBBY@BOBBY.COM",
+                Email = "bobby@bobby.com",
+                NormalizedEmail = "BOBBY@BOBBY.COM",
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                SecurityStamp = "7f434309-a4d9-48e9-9ebb-8803db794123",
+                Id = "00000000-ffff-ffff-ffff-fffffffff123"
+            };
             var passwordHash = new PasswordHasher<ApplicationUser>();
             user.PasswordHash = passwordHash.HashPassword(user, "Admin8*");
             modelBuilder.Entity<ApplicationUser>().HasData(user);
+
+            var anotherPasswordHash = new PasswordHasher<ApplicationUser>();
+            anotherUser.PasswordHash = passwordHash.HashPassword(anotherUser, "Bobby8*");
+            modelBuilder.Entity<ApplicationUser>().HasData(anotherUser);
 
             modelBuilder.Entity<PaymentType> ().HasData (
                 new PaymentType()
@@ -77,6 +95,13 @@ namespace Bangazon.Data {
                     UserId = user.Id,
                     Description = "Discover",
                     AccountNumber = "4102948572991"
+                },
+                new PaymentType()
+                {
+                    PaymentTypeId = 3,
+                    UserId = anotherUser.Id,
+                    Description = "Chase Sapphire Reserve",
+                    AccountNumber = "1234567890110"
                 }
             );
 
