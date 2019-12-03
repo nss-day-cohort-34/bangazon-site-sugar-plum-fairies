@@ -38,11 +38,17 @@ namespace Bangazon.Controllers
                 .Include(p => p.ProductType)
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
+            var orderProducts = await _context.OrderProduct
+                .Where(o => o.ProductId == product.ProductId)
+                .ToListAsync();
             if (product == null)
             {
                 return NotFound();
             }
-
+            if (orderProducts.Count > 0)
+            {
+                product.Quantity -= orderProducts.Count();
+            }
             return View(product);
         }
 
