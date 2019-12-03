@@ -208,6 +208,66 @@ namespace Bangazon.Data {
                     Title = "Hammer",
                     Quantity = 32,
                     Price = 22.69
+                },
+                new Product()
+                {
+                    ProductId = 6,
+                    ProductTypeId = 10,
+                    UserId = anotherUser.Id,
+                    Description = "They are environmentally friendly wheels",
+                    Title = "Prius Wheels",
+                    Quantity = 100,
+                    Price = 69.99
+                },
+                new Product()
+                {
+                    ProductId = 7,
+                    ProductTypeId = 10,
+                    UserId = anotherUser.Id,
+                    Description = "They are environmentally friendly mats for the winter",
+                    Title = "Prius Winter Mats",
+                    Quantity = 20,
+                    Price = 99.99
+                },
+                new Product()
+                {
+                    ProductId = 8,
+                    ProductTypeId = 10,
+                    UserId = anotherUser.Id,
+                    Description = "Environmentally friendly oil filters",
+                    Title = "Prius Oil Filter",
+                    Quantity = 200,
+                    Price = 12.99
+                },
+                new Product()
+                {
+                    ProductId = 9,
+                    ProductTypeId = 4,
+                    UserId = anotherUser.Id,
+                    Description = "I thought this game is free???",
+                    Title = "Team Fight Tactics",
+                    Quantity = 80,
+                    Price = 59.99
+                },
+                new Product()
+                {
+                    ProductId = 10,
+                    ProductTypeId = 4,
+                    UserId = anotherUser.Id,
+                    Description = "One of the best games ever made...",
+                    Title = "God of War 3",
+                    Quantity = 100,
+                    Price = 59.99
+                },
+                new Product()
+                {
+                    ProductId = 11,
+                    ProductTypeId = 9,
+                    UserId = anotherUser.Id,
+                    Description = "For people who play hockey",
+                    Title = "Ice Skates",
+                    Quantity = 120,
+                    Price = 270
                 }
             );
 
