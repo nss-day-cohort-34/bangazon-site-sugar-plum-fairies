@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
