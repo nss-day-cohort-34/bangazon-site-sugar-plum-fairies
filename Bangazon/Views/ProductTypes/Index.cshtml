@@ -1,0 +1,47 @@
+﻿@model Bangazon.Models.ProductTypesViewModels.ProductTypesViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table table-borderless">
+    <thead>
+        <tr>
+            <th>
+                Category
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var gp in Model.GroupedProducts) {
+    if (gp.ProductCount > 0)
+    {   
+        <tr class="table-secondary">
+            <td>
+                @Html.DisplayFor(modelItem => gp.TypeName)
+                (@Html.DisplayFor(modelItem => gp.ProductCount))
+            </td>
+            <td class="float-right">
+                <a asp-action="Edit" asp-route-id="@gp.TypeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@gp.TypeId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@gp.TypeId">Delete</a>
+            </td>
+        </tr>
+        foreach (var p in gp.Products)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@p.ProductId"><span class="ml-4">@p.Title</span></a>
+                </td>
+            </tr>
+        }
+    }
+}
+    </tbody>
+</table>

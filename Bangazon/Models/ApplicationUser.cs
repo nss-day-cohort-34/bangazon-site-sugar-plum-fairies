@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Models
@@ -19,6 +20,15 @@ namespace Bangazon.Models
         [Required]
         [Display(Name ="Last Name")]
         public string LastName { get; set; }
+        [NotMapped]
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
+
 
         [Required]
         public string StreetAddress { get; set; }
