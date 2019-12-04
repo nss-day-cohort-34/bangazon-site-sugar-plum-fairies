@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
-    //[Authorize]
-    public class ProductsController : Controller
+    [Authorize]               
+    public class ProductsController : Controller 
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -33,8 +33,13 @@ namespace Bangazon.Controllers
         public async Task<IActionResult> MyProducts()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id);
-            return View(await applicationDbContext.ToListAsync());
+            var products = await _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id).ToListAsync();
+            foreach (var p in products) {
+                var completedOrders = _context.OrderProduct.Where(op => op.Order.DateCompleted != null);
+                var numSold =completedOrders.Select(op => op.ProductId).Where(id => id == p.ProductId).Count();
+                p.NumberSold = numSold;
+            }
+            return View(products);
         }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
