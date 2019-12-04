@@ -7,43 +7,80 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Bangazon.Models.OrderViewModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // GET: Orders
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Order.Include(o => o.PaymentType).Include(o => o.User);
-            return View(await applicationDbContext.ToListAsync());
-        }
+        //// GET: Orders
+        //public async Task<IActionResult> Index()
+        //{
+        //    var applicationDbContext = _context.Order.Include(o => o.PaymentType).Include(o => o.User);
+        //    return View(await applicationDbContext.ToListAsync());
+        //}
 
         // GET: Orders/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details()
         {
-            if (id == null)
+            //Get the current user
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //Get the current user's order
+            var currentOrder = await _context.Order.FirstOrDefaultAsync(o => o.UserId == user.Id && o.DateCompleted == null);
+            if (currentOrder != null)
             {
-                return NotFound();
-            }
 
-            var order = await _context.Order
-                .Include(o => o.PaymentType)
-                .Include(o => o.User)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
-            if (order == null)
+                //Get the products associated with this order
+                var products = await _context.Product
+                                                .Include(p => p.OrderProducts)
+                                                .Where(p => p.OrderProducts.Any(op => op.OrderId == currentOrder.OrderId))
+                                                .ToListAsync();
+                //Instantiate a new OrderDetailViewModel and set the Order to the currentOrder
+                var orderDetails = new OrderDetailViewModel()
+                {
+                    Order = currentOrder
+                };
+
+                //Loop over the products and create a new line item for each product and set the LineItem's product to the current product
+                int counter = 0;
+                int id = 0;
+                foreach (Product product in products)
+                {
+                    if (id == product.ProductId)
+                    {
+                        counter++;
+                        orderDetails.LineItems[id].Units = counter;
+                    }
+                    else
+                    {
+                        counter++;
+                        id = product.ProductId;
+                        orderDetails.LineItems.Add(
+                            new OrderLineItem()
+                            {
+                                Product = product,
+                                Units = counter
+                            });
+                    }
+                }
+
+                return View(orderDetails);
+            } else
             {
-                return NotFound();
+                return View();
             }
-
-            return View(order);
         }
 
         // GET: Orders/Create
