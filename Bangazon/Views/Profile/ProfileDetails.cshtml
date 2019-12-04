@@ -1,0 +1,54 @@
+﻿
+
+@model Bangazon.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "ProfileDetails";
+}
+
+<h1>Profile</h1>
+
+<div>
+    <h4>Account Information</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StreetAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StreetAddress)
+        </dd>
+    </dl>
+    @foreach (var item in Model.PaymentTypes)
+    {
+
+        <td>
+            <p>Card Date:</p> @Html.DisplayFor(mo => item.DateCreated)
+        </td>
+        <td>
+            <p>Card Name</p> @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            <p>Card Number</p>  @Html.DisplayFor(modelItem => item.AccountNumber)
+        </td>
+
+
+    }
+    <td>
+        <a asp-controller="paymentTypes" asp-action="Index" asp-route-id="paymentTypes"> Payment Type</a> |
+
+    </td>
+</div>
+
