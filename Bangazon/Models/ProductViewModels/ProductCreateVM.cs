@@ -14,7 +14,9 @@ namespace Bangazon.Models.ProductViewModels
         {
             get
             {
-                return Categories?.Select(c => new SelectListItem(c.Label, c.ProductTypeId.ToString())).ToList();
+                var options = Categories?.Select(c => new SelectListItem(c.Label, c.ProductTypeId.ToString())).ToList();
+                options.Insert(0, new SelectListItem { Text = "Please Select...", Value = string.Empty, });
+                return options;
             }
         }
     }

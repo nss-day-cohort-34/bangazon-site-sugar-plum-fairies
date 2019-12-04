@@ -69,6 +69,7 @@ namespace Bangazon.Controllers
             var viewModel = new ProductCreateVM()
             {
                 Categories = await _context.ProductType.OrderBy(pt => pt.Label).ToListAsync()
+                
             };
             return View(viewModel);
         }
@@ -78,21 +79,21 @@ namespace Bangazon.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductCreateVM viewModel)
+        public async Task<IActionResult> Create(Product product)
         {
             ModelState.Remove("Product.User");
             ModelState.Remove("Product.UserId");
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                viewModel.Product.UserId = user.Id;
-                viewModel.Product.User = user;
-                _context.Add(viewModel.Product);
+                product.UserId = user.Id;
+                product.User = user;
+                _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(MyProducts));
             }
 
-            return View(viewModel);
+            return View(product);
         }
 
         // GET: Products/Edit/5
