@@ -31,6 +31,9 @@ namespace Bangazon.Models
         [Required]
         public int Quantity { get; set; }
 
+        [NotMapped]
+        public int NumberSold { get; set; }
+
         [Required]
         public string UserId {get; set;}
 

@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
-    public class ProductsController : Controller
+    [Authorize]               
+    public class ProductsController : Controller 
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Products
@@ -25,7 +30,17 @@ namespace Bangazon.Controllers
             var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
             return View(await applicationDbContext.ToListAsync());
         }
-
+        public async Task<IActionResult> MyProducts()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var products = await _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id).ToListAsync();
+            foreach (var p in products) {
+                var completedOrders = _context.OrderProduct.Where(op => op.Order.DateCompleted != null);
+                var numSold =completedOrders.Select(op => op.ProductId).Where(id => id == p.ProductId).Count();
+                p.NumberSold = numSold;
+            }
+            return View(products);
+        }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -42,7 +57,7 @@ namespace Bangazon.Controllers
             {
                 return NotFound();
             }
-
+          
             return View(product);
         }
 
