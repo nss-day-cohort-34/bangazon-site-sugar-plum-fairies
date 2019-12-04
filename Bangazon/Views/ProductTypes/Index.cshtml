@@ -24,12 +24,13 @@
     {   
         <tr class="table-secondary">
             <td>
+                <a asp-action="Details" asp-route-id="@gp.TypeId">
                 @Html.DisplayFor(modelItem => gp.TypeName)
+                </a>
                 (@Html.DisplayFor(modelItem => gp.ProductCount))
             </td>
             <td class="float-right">
                 <a asp-action="Edit" asp-route-id="@gp.TypeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@gp.TypeId">Details</a> |
                 <a asp-action="Delete" asp-route-id="@gp.TypeId">Delete</a>
             </td>
         </tr>

@@ -42,14 +42,20 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
-            var productType = await _context.ProductType
-                .FirstOrDefaultAsync(m => m.ProductTypeId == id);
-            if (productType == null)
+            var model = new ProductTypesViewModel();
+            model.GroupedProducts = await _context.ProductType.Select
+                                        (pt => new GroupedProducts
+                                        {
+                                            TypeId = pt.ProductTypeId,
+                                            TypeName = pt.Label,
+                                            ProductCount = pt.Products.Count(),
+                                            Products = pt.Products.Where(pt => pt.ProductTypeId == id)
+                                        }).ToListAsync();
+            if (model == null)
             {
                 return NotFound();
             }
-
-            return View(productType);
+            return View(model);
         }
 
         // GET: ProductTypes/Create
