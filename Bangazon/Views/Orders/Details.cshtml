@@ -23,7 +23,7 @@
         }
         <div class="row justify-content-end mt-4">
             <a class="btn btn-primary text-white">Place Order</a>
-            <a class="btn btn-outline-danger text-danger" asp-action="Delete">Cancel Order</a>
+            <a class="btn btn-outline-danger text-danger" asp-route-id="@Model.Order.OrderId" asp-action="Delete">Cancel Order</a>
         </div>
     }
     else
