@@ -45,7 +45,7 @@ namespace Bangazon.Controllers
                 //Get the products associated with this order
                 var products = await _context.Product
                                                 .Include(p => p.OrderProducts)
-                                                .Where(p => 
+                                                .Where(p =>
                                                        p.OrderProducts.Any(op => op.OrderId == currentOrder.OrderId)
                                                     )
                                                 .ToListAsync();
@@ -222,7 +222,21 @@ namespace Bangazon.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFromCart(string title, int ProductId)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var currentOrder = GetCurrentOrder(user.Id);
 
+            var itemsToDelete = await _context.OrderProduct.Where(op => op.ProductId == ProductId && op.OrderId == currentOrder.OrderId).ToListAsync();
+            foreach (var item in itemsToDelete)
+            {
+                _context.OrderProduct.Remove(item);
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details");
+        }
         private bool OrderExists(int id)
         {
             return _context.Order.Any(e => e.OrderId == id);
