@@ -44,6 +44,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Details">View Cart</a>
                         </li>
+                        <li class="nav-item">
+                            <form asp-controller="Products" asp-action="Index">
+                                <p>
+                                    <input type="text" name="SearchString">
+                                    <input type="submit" value="Search" />
+                                </p>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
