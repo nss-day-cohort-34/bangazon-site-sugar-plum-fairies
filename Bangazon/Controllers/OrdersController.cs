@@ -75,7 +75,9 @@ namespace Bangazon.Controllers
                             });
                     }
                 }
-
+                //Get the payment types for the user
+                orderDetails.PaymentTypes = await _context.PaymentType.Where(pt => pt.UserId == user.Id).ToListAsync();
+                
                 return View(orderDetails);
             }
             else
