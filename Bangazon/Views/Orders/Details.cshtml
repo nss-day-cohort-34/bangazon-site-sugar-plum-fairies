@@ -6,7 +6,7 @@
 
 <h1>Cart</h1>
 
-<div>
+<div class="container">
     <hr />
     @if (Model != null)
     {
@@ -17,17 +17,34 @@
                     <h3>@lineitem.Product.Title</h3>
                     <h4>Quantity: <span>@lineitem.Units</span></h4>
                     <h4>Cost: $<span>@lineitem.Cost</span></h4>
-                    <a class="btn btn-outline-danger text-danger">Delete</a>
+                    <form asp-action="DeleteFromCart">
+                        <input data-val="true"
+                               data-val-number="The field ProductId must be a number."
+                               data-val-required="The ProductId field is required."
+                               id="ProductId"
+                               name="ProductId"
+                               type="hidden"
+                               value="@lineitem.Product.ProductId" />
+                        <input type="submit" value="Delete" class="btn btn-outline-danger text-danger" />
+                    </form>
                 </div>
             </div>
         }
+        <div class="row justify-content-end">
+            <div class="form-group">
+                <label asp-for="PaymentTypeId" class="control-label">Choose A Payment Type</label>
+                <select asp-for="PaymentTypeId" class="form-control" asp-items="@Model.PaymentOptions"></select>
+            </div>
+        </div>
         <div class="row justify-content-end mt-4">
             <a class="btn btn-primary text-white">Place Order</a>
-            <a class="btn btn-outline-danger text-danger">Cancel Order</a>
+
+            <a class="btn btn-outline-danger text-danger" asp-route-id="@Model.Order.OrderId" asp-action="Delete">Cancel Order</a>
         </div>
     }
     else
     {
         <h2>There is nothing currently in your cart.</h2>
     }
+
 </div>
