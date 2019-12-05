@@ -36,10 +36,19 @@
                 <select asp-for="PaymentTypeId" class="form-control" asp-items="@Model.PaymentOptions"></select>
             </div>
         </div>
-        <div class="row justify-content-end mt-4">
-            <a class="btn btn-primary text-white">Place Order</a>
-            <a class="btn btn-outline-danger text-danger ml-3">Cancel Order</a>
-        </div>
+        <form asp-action="PlaceOrder">
+            <input data-val="true"
+                   data-val-number="The field OrderId must be a number."
+                   data-val-required="The OrderId field is required."
+                   id="OrderId"
+                   name="OrderId"
+                   type="hidden"
+                   value="@Model.Order.OrderId" />
+            <div class="row justify-content-end mt-4">
+                <input type="submit" class="btn btn-primary text-white" value="Place Order" />
+                <a class="btn btn-outline-danger text-danger ml-3">Cancel Order</a>
+            </div>
+        </form>
     }
     else
     {

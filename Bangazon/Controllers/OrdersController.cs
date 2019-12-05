@@ -123,12 +123,13 @@ namespace Bangazon.Controllers
                     User = user
                 };
                 _context.Update(newOrder);
-                int newOrderId = await _context.SaveChangesAsync();
-                for (int i = 0; i <= Quantity; i++)
+                await _context.SaveChangesAsync();
+                var newOrderFromDB = GetCurrentOrder(user.Id);
+                for (int i = 0; i < Quantity; i++)
                 {
                     OrderProduct orderProduct = new OrderProduct()
                     {
-                        OrderId = newOrderId,
+                        OrderId = newOrderFromDB.OrderId,
                         ProductId = ProductId
                     };
                     _context.Update(orderProduct);
@@ -139,22 +140,18 @@ namespace Bangazon.Controllers
             return RedirectToAction("Details");
         }
 
-        // GET: Orders/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        //POST: Orders/PlaceOrder
+        //Process an order for a user
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PlaceOrder(int OrderId)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var currentOrder = await _context.Order.FirstOrDefaultAsync(o => o.OrderId == OrderId);
+            currentOrder.DateCompleted = DateTime.Now;
+            _context.Update(currentOrder);
+            await _context.SaveChangesAsync();
 
-            var order = await _context.Order.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentType, "PaymentTypeId", "AccountNumber", order.PaymentTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", order.UserId);
-            return View(order);
+            return View();
         }
 
         // POST: Orders/Edit/5
