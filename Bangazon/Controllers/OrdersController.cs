@@ -83,30 +83,57 @@ namespace Bangazon.Controllers
             }
         }
 
-        // GET: Orders/Create
-        public IActionResult Create()
-        {
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentType, "PaymentTypeId", "AccountNumber");
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
-        }
-
-        // POST: Orders/Create
+        // POST: Orders/AddToOrder
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpGet]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,DateCreated,DateCompleted,UserId,PaymentTypeId")] Order order)
+        public async Task<IActionResult> AddToOrder(int ProductId, int Quantity)
         {
-            if (ModelState.IsValid)
+            //Get the current user
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //Check if Order exists for the current user
+            var currentOrder = GetCurrentOrder(user.Id);
+            
+            //If yes, add the product to OrderProducts for the Quantity amount of times
+            if(currentOrder != null)
             {
-                _context.Add(order);
+                OrderProduct orderProduct = new OrderProduct()
+                {
+                    OrderId = currentOrder.OrderId,
+                    ProductId = ProductId
+                };
+                for (int i = 0; i <= Quantity; i++)
+                {
+                    _context.Update(orderProduct);
+                }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentType, "PaymentTypeId", "AccountNumber", order.PaymentTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", order.UserId);
-            return View(order);
+            //Otherwise, create a new order and add the products to OrderProducts for the Quantity amount of times
+            else
+            {
+                Order newOrder = new Order()
+                {
+                    DateCreated = DateTime.Now,
+                    UserId = user.Id,
+                    User = user
+                };
+                _context.Update(newOrder);
+                int newOrderId = await _context.SaveChangesAsync();
+                OrderProduct orderProduct = new OrderProduct()
+                {
+                    OrderId = newOrderId,
+                    ProductId = ProductId
+                };
+                for (int i = 0; i <= Quantity; i++)
+                {
+                    _context.Update(orderProduct);
+                }
+                await _context.SaveChangesAsync();
+            }
+            
+            return View();
         }
 
         // GET: Orders/Edit/5
@@ -198,6 +225,11 @@ namespace Bangazon.Controllers
         private bool OrderExists(int id)
         {
             return _context.Order.Any(e => e.OrderId == id);
+        }
+        private Order GetCurrentOrder(string userId)
+        {
+            var currentOrder =  _context.Order.Where(o => o.UserId == userId && o.DateCompleted == null).ToList();
+            return (currentOrder[0]);
         }
     }
 }
