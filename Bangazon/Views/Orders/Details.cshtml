@@ -17,7 +17,16 @@
                     <h3>@lineitem.Product.Title</h3>
                     <h4>Quantity: <span>@lineitem.Units</span></h4>
                     <h4>Cost: $<span>@lineitem.Cost</span></h4>
-                    <a class="btn btn-outline-danger text-danger">Delete</a>
+                    <form asp-action="DeleteFromCart">
+                        <input data-val="true"
+                               data-val-number="The field ProductId must be a number."
+                               data-val-required="The ProductId field is required."
+                               id="ProductId"
+                               name="ProductId"
+                               type="hidden"
+                               value="@lineitem.Product.ProductId" />
+                        <input type="submit" value="Delete" class="btn btn-outline-danger text-danger" />
+                    </form>
                 </div>
             </div>
         }
