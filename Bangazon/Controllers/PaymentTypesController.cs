@@ -64,13 +64,15 @@ namespace Bangazon.Views
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PaymentTypeId,DateCreated,Description,AccountNumber,UserId")] PaymentType paymentType)
+        public async Task<IActionResult> Create( PaymentType paymentType)
         {
+            ModelState.Remove("User");
             ModelState.Remove("UserId");
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 paymentType.UserId = user.Id;
+                paymentType.User = user;
                 _context.Add(paymentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
