@@ -13,8 +13,8 @@ using Bangazon.Models.ProductViewModels;
 
 namespace Bangazon.Controllers
 {
-    [Authorize]               
-    public class ProductsController : Controller 
+    [Authorize]
+    public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -26,18 +26,28 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string SearchString)
         {
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
-            return View(await applicationDbContext.ToListAsync());
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                var searchProducts = _context.Product.Where(p => p.Title.Contains(SearchString)).ToListAsync();
+
+                return View(await searchProducts);
+            } else
+            {
+                var searchProducts = _context.Product.ToListAsync();
+
+                return View(await searchProducts);
+            }
         }
         public async Task<IActionResult> MyProducts()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var products = await _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id).ToListAsync();
-            foreach (var p in products) {
+            foreach (var p in products)
+            {
                 var completedOrders = _context.OrderProduct.Where(op => op.Order.DateCompleted != null);
-                var numSold =completedOrders.Select(op => op.ProductId).Where(id => id == p.ProductId).Count();
+                var numSold = completedOrders.Select(op => op.ProductId).Where(id => id == p.ProductId).Count();
                 p.NumberSold = numSold;
             }
             return View(products);
@@ -58,7 +68,7 @@ namespace Bangazon.Controllers
             {
                 return NotFound();
             }
-          
+
             return View(product);
         }
 
@@ -69,7 +79,7 @@ namespace Bangazon.Controllers
             var viewModel = new ProductCreateVM()
             {
                 Categories = await _context.ProductType.OrderBy(pt => pt.Label).ToListAsync()
-                
+
             };
             return View(viewModel);
         }
