@@ -46,7 +46,7 @@
                    value="@Model.Order.OrderId" />
             <div class="row justify-content-end mt-4">
                 <input type="submit" class="btn btn-primary text-white" value="Place Order" />
-                <a class="btn btn-outline-danger text-danger ml-3">Cancel Order</a>
+            <a class="btn btn-outline-danger text-danger" asp-route-id="@Model.Order.OrderId" asp-action="Delete">Cancel Order</a>
             </div>
         </form>
     }
