@@ -43,12 +43,9 @@ namespace Bangazon.Controllers
             {
 
                 //Get the products associated with this order
+                var orderProducts = await _context.OrderProduct.Where(op => op.OrderId == currentOrder.OrderId).ToListAsync();
                 var products = await _context.Product
-                                                .Include(p => p.OrderProducts)
-                                                .Where(p => 
-                                                       p.OrderProducts.Any(op => op.OrderId == currentOrder.OrderId)
-                                                    )
-                                                .ToListAsync();
+                                                .Where(p => orderProducts.Any(op => op.ProductId == p.ProductId)).ToListAsync();
                 //Instantiate a new OrderDetailViewModel and set the Order to the currentOrder
                 var orderDetails = new OrderDetailViewModel()
                 {
@@ -59,10 +56,10 @@ namespace Bangazon.Controllers
                 int id = 0;
                 foreach (Product product in products)
                 {
-                    var orderProducts = await _context.OrderProduct.Where(op => op.ProductId == product.ProductId && op.OrderId == currentOrder.OrderId).ToListAsync();
+                    var thisProductsOrderProducts = await _context.OrderProduct.Where(op => op.ProductId == product.ProductId && op.OrderId == currentOrder.OrderId).ToListAsync();
                     if (id == product.ProductId)
                     {
-                        orderDetails.LineItems[id].Units = orderProducts.Count;
+                        orderDetails.LineItems[id].Units = thisProductsOrderProducts.Count;
                     }
                     else
                     {
@@ -71,7 +68,7 @@ namespace Bangazon.Controllers
                             new OrderLineItem()
                             {
                                 Product = product,
-                                Units = orderProducts.Count
+                                Units = thisProductsOrderProducts.Count
                             });
                     }
                 }
