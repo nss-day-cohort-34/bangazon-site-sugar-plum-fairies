@@ -9,6 +9,7 @@ using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Bangazon.Models.ProductViewModels;
 
 namespace Bangazon.Controllers
 {
@@ -62,11 +63,15 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label");
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var viewModel = new ProductCreateVM()
+            {
+                Categories = await _context.ProductType.OrderBy(pt => pt.Label).ToListAsync()
+                
+            };
+            return View(viewModel);
         }
 
         // POST: Products/Create
@@ -74,16 +79,20 @@ namespace Bangazon.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,DateCreated,Description,Title,Price,Quantity,UserId,City,ImagePath,Active,ProductTypeId")] Product product)
+        public async Task<IActionResult> Create(Product product)
         {
+            ModelState.Remove("Product.User");
+            ModelState.Remove("Product.UserId");
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                product.UserId = user.Id;
+                product.User = user;
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(MyProducts));
             }
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
+
             return View(product);
         }
 
@@ -170,7 +179,7 @@ namespace Bangazon.Controllers
             var product = await _context.Product.FindAsync(id);
             _context.Product.Remove(product);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyProducts));
         }
 
         private bool ProductExists(int id)
