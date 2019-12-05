@@ -38,14 +38,16 @@ namespace Bangazon.Controllers
             //Get the current user
             var user = await _userManager.GetUserAsync(HttpContext.User);
             //Get the current user's order
-            var currentOrder = await _context.Order.FirstOrDefaultAsync(o => o.UserId == user.Id && o.DateCompleted == null);
+            var currentOrder = GetCurrentOrder(user.Id);
             if (currentOrder != null)
             {
 
                 //Get the products associated with this order
                 var products = await _context.Product
                                                 .Include(p => p.OrderProducts)
-                                                .Where(p => p.OrderProducts.Any(op => op.OrderId == currentOrder.OrderId))
+                                                .Where(p => 
+                                                       p.OrderProducts.Any(op => op.OrderId == currentOrder.OrderId)
+                                                    )
                                                 .ToListAsync();
                 //Instantiate a new OrderDetailViewModel and set the Order to the currentOrder
                 var orderDetails = new OrderDetailViewModel()
@@ -54,30 +56,29 @@ namespace Bangazon.Controllers
                 };
 
                 //Loop over the products and create a new line item for each product and set the LineItem's product to the current product
-                int counter = 0;
                 int id = 0;
                 foreach (Product product in products)
                 {
+                    var orderProducts = await _context.OrderProduct.Where(op => op.ProductId == product.ProductId && op.OrderId == currentOrder.OrderId).ToListAsync();
                     if (id == product.ProductId)
                     {
-                        counter++;
-                        orderDetails.LineItems[id].Units = counter;
+                        orderDetails.LineItems[id].Units = orderProducts.Count;
                     }
                     else
                     {
-                        counter++;
                         id = product.ProductId;
                         orderDetails.LineItems.Add(
                             new OrderLineItem()
                             {
                                 Product = product,
-                                Units = counter
+                                Units = orderProducts.Count
                             });
                     }
                 }
 
                 return View(orderDetails);
-            } else
+            }
+            else
             {
                 return View();
             }
@@ -95,17 +96,17 @@ namespace Bangazon.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             //Check if Order exists for the current user
             var currentOrder = GetCurrentOrder(user.Id);
-            
+
             //If yes, add the product to OrderProducts for the Quantity amount of times
-            if(currentOrder != null)
+            if (currentOrder != null)
             {
-                OrderProduct orderProduct = new OrderProduct()
+                for (int i = 0; i < Quantity; i++)
                 {
-                    OrderId = currentOrder.OrderId,
-                    ProductId = ProductId
-                };
-                for (int i = 0; i <= Quantity; i++)
-                {
+                    OrderProduct orderProduct = new OrderProduct()
+                    {
+                        OrderId = currentOrder.OrderId,
+                        ProductId = ProductId
+                    };
                     _context.Update(orderProduct);
                 }
                 await _context.SaveChangesAsync();
@@ -121,19 +122,19 @@ namespace Bangazon.Controllers
                 };
                 _context.Update(newOrder);
                 int newOrderId = await _context.SaveChangesAsync();
-                OrderProduct orderProduct = new OrderProduct()
-                {
-                    OrderId = newOrderId,
-                    ProductId = ProductId
-                };
                 for (int i = 0; i <= Quantity; i++)
                 {
+                    OrderProduct orderProduct = new OrderProduct()
+                    {
+                        OrderId = newOrderId,
+                        ProductId = ProductId
+                    };
                     _context.Update(orderProduct);
                 }
                 await _context.SaveChangesAsync();
             }
-            
-            return View();
+
+            return RedirectToAction("Details");
         }
 
         // GET: Orders/Edit/5
@@ -228,8 +229,12 @@ namespace Bangazon.Controllers
         }
         private Order GetCurrentOrder(string userId)
         {
-            var currentOrder =  _context.Order.Where(o => o.UserId == userId && o.DateCompleted == null).ToList();
-            return (currentOrder[0]);
+            var currentOrder = _context.Order.Where(o => o.UserId == userId && o.DateCompleted == null).ToList();
+            if (currentOrder.Count > 0)
+            {
+                return (currentOrder[0]);
+            }
+            return null;
         }
     }
 }
