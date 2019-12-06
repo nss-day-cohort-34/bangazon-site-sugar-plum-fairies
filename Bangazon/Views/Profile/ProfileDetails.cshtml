@@ -13,7 +13,7 @@
     <p> <a asp-controller="Profile" asp-action="Edit"asp-route-id="Profile">Edit Profile</a></p>
     <hr />
     <dl class="row">
-        
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FirstName)
         </dt>
@@ -32,6 +32,14 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.StreetAddress)
         </dd>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNumber) 
+        </dd>
+        
     </dl>
     @foreach (var item in Model.PaymentTypes)
     {
@@ -51,7 +59,7 @@
 <td>
     <a asp-controller="paymentTypes" asp-action="Create" asp-route-id="paymentTypes"> Add Payment Type</a> |
     <a asp-controller="paymentTypes" asp-action="Index"> Manage Payment Types</a> |
-
+  
 </td>
 </div>
 
