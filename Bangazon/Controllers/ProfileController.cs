@@ -63,14 +63,11 @@ namespace Bangazon.Controllers
 
             user.FirstName = applicationUser.FirstName;
             user.LastName = applicationUser.LastName;
-            user.StreetAddress = applicationUser.StreetAddress;
             user.PhoneNumber = applicationUser.PhoneNumber;
+            user.StreetAddress = applicationUser.StreetAddress;
 
 
-            if (id != user.Id)
-            {
-                return NotFound();
-            }
+           
             if (ModelState.IsValid)
             {
                 try
@@ -78,7 +75,7 @@ namespace Bangazon.Controllers
 
                     IdentityResult result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
-                        return RedirectToAction(nameof(ProfileController));
+                        return RedirectToAction(nameof(ProfileDetails));
                     else
                     {
                         foreach (IdentityError error in result.Errors)
@@ -96,7 +93,7 @@ namespace Bangazon.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(ProfileController));
+                return RedirectToAction(nameof(ProfileDetails));
             }
             return View(user);
         }
