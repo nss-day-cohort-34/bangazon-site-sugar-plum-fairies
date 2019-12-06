@@ -84,12 +84,16 @@ namespace Bangazon.Views
         // GET: PaymentTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+           
+
             if (id == null)
             {
                 return NotFound();
             }
 
             var paymentType = await _context.PaymentType.FindAsync(id);
+           
+
             if (paymentType == null)
             {
                 return NotFound();
@@ -103,8 +107,12 @@ namespace Bangazon.Views
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PaymentTypeId,DateCreated,Description,AccountNumber,UserId")] PaymentType paymentType)
+        public async Task<IActionResult> Edit(int id, [Bind("PaymentTypeId,DateCreated,Description,AccountNumber")] PaymentType paymentType)
+           
         {
+            ModelState.Remove("User");
+            ModelState.Remove("UserId");
+
             if (id != paymentType.PaymentTypeId)
             {
                 return NotFound();
@@ -114,6 +122,8 @@ namespace Bangazon.Views
             {
                 try
                 {
+                    var user = await _userManager.GetUserAsync(HttpContext.User);
+                    paymentType.UserId = user.Id;
                     _context.Update(paymentType);
                     await _context.SaveChangesAsync();
                 }
