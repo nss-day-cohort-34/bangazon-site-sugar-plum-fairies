@@ -10,8 +10,10 @@
 
 <div>
     <h4>Account Information</h4>
+    <p> <a asp-controller="Profile" asp-action="Edit"asp-route-id="Profile">Edit Profile</a></p>
     <hr />
     <dl class="row">
+        
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FirstName)
         </dt>
